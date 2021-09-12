@@ -17,6 +17,12 @@ const gravatar = require("gravatar");
 // importing bcrypt
 const bcrypt = require("bcryptjs");
 
+// importing jsonwebtoken
+const jwt = require("jsonwebtoken");
+
+// importing config
+const config = require("config");
+
 //
 
 // @route POST     api/users
@@ -63,11 +69,28 @@ router.post(
       // creating the hashed password with bcrypt
       user.password = await bcrypt.hash(password, salt);
 
-      // Save the user to our database
+      // Save the user to our database. This await returns a promise with the saved user in our Database
       await user.save();
 
-      // Return Jsonwebtoken
-      res.send("User Registered");
+      // Return Jsonwebtoken with our saved user's ID. Note. once we created a new instance of our User Model and saved it,
+      // Mongo Db automatically creates an ID for our user
+      const payload = {
+        currentUser: {
+          id: user.id,
+        },
+      };
+
+      // creating the JWT with the payload
+      jwt.sign(
+        payload,
+        config.get("jwtSecret"),
+        { expiresIn: 3600 },
+        (err, token) => {
+          if (err) throw err;
+
+          res.json({ token });
+        }
+      );
     } catch (error) {
       console.error(error.message);
       res.status(500).send("server error");
