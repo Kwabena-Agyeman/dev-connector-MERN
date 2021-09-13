@@ -15,9 +15,16 @@ module.exports = (req, res, next) => {
   // Verify Token
 
   try {
+    //   We are decoding the token to get our payload which contains the user ID
+    //   We created the payload when we were registering the user
+    //   Therefore every token decoded will contain the user's id
     const decoded = jwt.verify(token, config.get("jwtSecret"));
+    console.log(decoded);
 
-    req.user = decoded.user;
+    //Decoded is out jwt token,
+    // Remember when we were creating out token we passed in currentUser in the payload object,
+    // That is where decoded.currentUser is coming
+    req.user = decoded.currentUser;
 
     next();
   } catch (error) {
