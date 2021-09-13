@@ -19,7 +19,6 @@ module.exports = (req, res, next) => {
     //   We created the payload when we were registering the user
     //   Therefore every token decoded will contain the user's id
     const decoded = jwt.verify(token, config.get("jwtSecret"));
-    console.log(decoded);
 
     //Decoded is out jwt token,
     // Remember when we were creating out token we passed in currentUser in the payload object,
