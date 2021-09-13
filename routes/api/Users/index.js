@@ -72,8 +72,9 @@ router.post(
       // Save the user to our database. This await returns a promise with the saved user in our Database
       await user.save();
 
-      // Return Jsonwebtoken with our saved user's ID. Note. once we created a new instance of our User Model and saved it,
-      // Mongo Db automatically creates an ID for our user
+      // Creating a payload object, it will be used to create a JWT for our logged in user
+      // the user.id in the payload object is an id that is automatically generated from mongo when we save the user in our DB
+      // the id is returned when we await user.save()
       const payload = {
         currentUser: {
           id: user.id,
