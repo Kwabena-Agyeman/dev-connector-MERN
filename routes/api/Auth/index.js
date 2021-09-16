@@ -14,7 +14,7 @@ const authmiddleware = require("../../../middlewares/auth");
 router.get("/", authmiddleware, async (req, res) => {
   try {
     // NOTE : req.user was created and returned from our auth-middleware function and it contains users id
-    // we assigned out decoded token [which contains the user's id] to req.user .We did this in auth-middleware
+    // we assigned our decoded token [which contains the user's id] to req.user .We did this in auth-middleware
     const user = await UserModel.findById(req.user.id).select("-password");
     res.json(user);
   } catch (error) {
@@ -62,7 +62,7 @@ router.post(
       // Creating a payload with our found users ID
       // this payload object will be used to create a JWT for our logged in user
       const payload = {
-        currentUser: {
+        user: {
           id: user.id,
         },
       };

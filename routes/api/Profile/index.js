@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../../../middlewares/auth");
 const validationMiddleware = require("../../../middlewares/validator");
-const Profile = require("../../../models/Profile");
+
 const profileModel = require("../../../models/Profile");
 const UserModel = require("../../../models/User");
 
@@ -59,6 +59,8 @@ router.post(
       instagram,
       linkedin,
     } = req.body;
+
+    console.log("REQ USER", req.user.currentUser);
 
     // Build profile object
     const profileFields = {};
@@ -119,5 +121,23 @@ router.post(
     }
   }
 );
+
+//
+// @route         GET  api/profile
+// @description   GET ALL PROFILES
+// @access        Public Route
+
+router.get("/", async (req, res) => {
+  try {
+    // the populate method allows us to populate our query with data from another collection
+    // remeber, our user's ID will be the same as his/her profile ID becase we referenced user ID when creating the model
+    profiles = await profileModel.find().populate("user", ["name", "avatar"]);
+
+    res.json(profiles);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router;

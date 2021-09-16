@@ -15,17 +15,30 @@ module.exports = (req, res, next) => {
   // Verify Token
 
   try {
-    //   We are decoding the token to get our payload which contains the user ID
-    //   We created the payload when we were registering the user
-    //   Therefore every token decoded will contain the user's id
-    const decoded = jwt.verify(token, config.get("jwtSecret"));
+    // //   We are decoding the token to get our payload which contains the user ID
+    // //   We created the payload when we were registering the user
+    // //   Therefore every token decoded will contain the user's id
+    // const decoded = jwt.verify(token, config.get("jwtSecret"));
 
-    //Decoded is out jwt token,
-    // Remember when we were creating out token we passed in currentUser in the payload object,
-    // That is where decoded.currentUser is coming
-    req.user = decoded.currentUser;
+    // console.log(decoded.currentuser.id);
 
-    next();
+    // //Decoded is out jwt token,
+    // // Remember when we were creating out token we passed in currentUser in the payload object,
+    // // That is where decoded.currentUser is coming
+    // req.user = decoded;
+
+    // console.log("req.user", req.user);
+
+    // next();
+
+    jwt.verify(token, config.get("jwtSecret"), (error, decoded) => {
+      if (error) {
+        return res.status(401).json({ msg: "Token is not valid" });
+      } else {
+        req.user = decoded;
+        next();
+      }
+    });
   } catch (error) {
     res.status(401).json({ msg: "Token is not valid" });
   }
