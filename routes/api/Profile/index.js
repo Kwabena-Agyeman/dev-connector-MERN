@@ -256,7 +256,22 @@ router.delete("/experience/:exp_id", authMiddleware, async (req, res) => {
     const userID = req.user.currentUser.id;
 
     const profile = await profileModel.findOne({ user: userID });
-  } catch (error) {}
+
+    // Filter through your experience array and remove the experience that matches the req.params.id
+
+    const newExpArray = profile.experience.filter((item) => {
+      return item.id !== req.params.exp_id;
+    });
+
+    profile.experience = newExpArray;
+
+    await profile.save();
+
+    res.json(profile);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("server error");
+  }
 });
 
 module.exports = router;
