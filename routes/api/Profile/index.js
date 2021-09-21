@@ -1,3 +1,5 @@
+/** @format */
+
 const express = require("express");
 
 const router = express.Router();
@@ -60,12 +62,16 @@ router.post(
       linkedin,
     } = req.body;
 
-    console.log("REQ USER", req.user.currentUser);
+    // remember our user's ID is in our req.user object
+    // We put it there after decoding our jwt in our auth middleware
+    console.log("REQ USER", req.user.currentUser.id);
+
+    const userID = req.user.currentUser.id;
 
     // Build profile object
     const profileFields = {};
 
-    profileFields.user = req.user.id;
+    profileFields.user = userID;
 
     if (company) profileFields.company = company;
 
@@ -95,8 +101,10 @@ router.post(
     console.log(profileFields.skills);
 
     try {
-      // Checking is any profile alreadt exists with our user's id
-      let profile = await profileModel.findOne({ user: req.user.id });
+      // Checking if any profile alreadt exists with our user's id
+      let profile = await profileModel.findOne({
+        user: userID,
+      });
 
       // if profile exits, then we want to update that profile
       if (profile) {
@@ -131,7 +139,56 @@ router.get("/", async (req, res) => {
   try {
     // the populate method allows us to populate our query with data from another collection
     // remeber, our user's ID will be the same as his/her profile ID becase we referenced user ID when creating the model
-    profiles = await profileModel.find().populate("user", ["name", "avatar"]);
+    const profiles = await profileModel
+      .find()
+      .populate("user", ["name", "avatar"]);
+
+    res.json(profiles);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+//
+// @route         GET  api/profile/user/:user_id
+// @description   GET SINGLE PROFILE BY USER ID
+// @access        Public Route
+
+router.get("/user/:user_id", async (req, res) => {
+  try {
+    // the populate method allows us to populate our query with data from another collection
+    // remeber, our user's ID will be the same as his/her profile ID becase we referenced user ID when creating the model
+    const profile = await profileModel
+      .findOne({ user: req.params.user_id })
+      .populate("user", ["name", "avatar"]);
+
+    if (!profile) {
+      return res.status(400).json({ msg: "Profile not found" });
+    }
+
+    res.json(profile);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(400).json({ msg: "Profile not found" });
+    }
+    res.status(500).send("Server Error");
+  }
+});
+
+//
+// @route         GET  api/profile
+// @description   GET ALL PROFILES
+// @access        Public Route
+
+router.get("/", async (req, res) => {
+  try {
+    // the populate method allows us to populate our query with data from another collection
+    // remeber, our user's ID will be the same as his/her profile ID becase we referenced user ID when creating the model
+    const profiles = await profileModel
+      .find()
+      .populate("user", ["name", "avatar"]);
 
     res.json(profiles);
   } catch (error) {
