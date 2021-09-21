@@ -11,7 +11,7 @@ const UserModel = require("../../../models/User");
 
 const validations = require("./validations");
 
-// ************************************************************************
+// ****************************************************************************************************************//
 
 // @route GET api/profile/me
 // @description GET CURRENT USERS PROFILE
@@ -36,7 +36,7 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-//
+//*********************************************************************************************************** */
 // @route POST api/profile
 // @description CREATE / UPDATE A USER PROFILE
 // @access Private Route
@@ -130,7 +130,7 @@ router.post(
   }
 );
 
-//
+//********************************************************************************************************************* */
 // @route         GET  api/profile
 // @description   GET ALL PROFILES
 // @access        Public Route
@@ -150,7 +150,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-//
+//********************************************************************************************************************************** */
 // @route         GET  api/profile/user/:user_id
 // @description   GET SINGLE PROFILE BY USER ID
 // @access        Public Route
@@ -177,24 +177,86 @@ router.get("/user/:user_id", async (req, res) => {
   }
 });
 
-//
-// @route         GET  api/profile
-// @description   GET ALL PROFILES
-// @access        Public Route
+//*************************************************************************************************************************** */
+// @route         DELETE  api/profile
+// @description   DELETE PROFILE, USER & POSTS
+// @access        PRIVATE Route
 
-router.get("/", async (req, res) => {
+router.delete("/", authMiddleware, async (req, res) => {
   try {
-    // the populate method allows us to populate our query with data from another collection
-    // remeber, our user's ID will be the same as his/her profile ID becase we referenced user ID when creating the model
-    const profiles = await profileModel
-      .find()
-      .populate("user", ["name", "avatar"]);
+    // remember our user's ID is in our req.user object
+    // We put it there after decoding our jwt in our auth middleware
+    const userID = req.user.currentUser.id;
+
+    // Remove user's profile
+    await profileModel.findOneAndRemove({ user: userID });
+
+    // Remove user
+    await UserModel.findOneAndRemove({ _id: userID });
+
+    res.json({ msg: "User deleted" });
 
     res.json(profiles);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server Error");
   }
+});
+
+//*************************************************************************************************************************** */
+// @route         PUT  api/profile/experience
+// @description   ADD PROFILE EXPERIENCE
+// @access        PRIVATE Route
+
+router.put(
+  "/experience",
+  authMiddleware,
+  validations.ExperienceValidations,
+  validationMiddleware,
+  async (req, res) => {
+    const { title, company, location, from, to, current, description } =
+      req.body;
+
+    const newExperience = {
+      title: title,
+      company: company,
+      location: location,
+      from: from,
+      to: to,
+      current: current,
+      description: description,
+    };
+
+    const userID = req.user.currentUser.id;
+
+    try {
+      const profile = await profileModel.findOne({ user: userID });
+
+      console.log(profile);
+
+      profile.experience.unshift(newExperience);
+
+      await profile.save();
+
+      res.json(profile);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+
+//*************************************************************************************************************************** */
+// @route         DELETE  api/profile/experience/:exp_id
+// @description   DELETE EXPERIENCE FROM PROFILE
+// @access        PRIVATE Route
+
+router.delete("/experience/:exp_id", authMiddleware, async (req, res) => {
+  try {
+    const userID = req.user.currentUser.id;
+
+    const profile = await profileModel.findOne({ user: userID });
+  } catch (error) {}
 });
 
 module.exports = router;

@@ -1,3 +1,5 @@
+/** @format */
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -62,7 +64,7 @@ router.post(
       // Creating a payload with our found users ID
       // this payload object will be used to create a JWT for our logged in user
       const payload = {
-        user: {
+        currentUser: {
           id: user.id,
         },
       };
