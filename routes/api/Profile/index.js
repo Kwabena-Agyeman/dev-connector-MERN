@@ -274,4 +274,75 @@ router.delete("/experience/:exp_id", authMiddleware, async (req, res) => {
   }
 });
 
+//*************************************************************************************************************************** */
+// @route         PUT  api/profile/education
+// @description   ADD PROFILE EDUCATION
+// @access        PRIVATE Route
+
+router.put(
+  "/education",
+  authMiddleware,
+  validations.EducationValidations,
+  validationMiddleware,
+  async (req, res) => {
+    const { school, degree, fieldofstudy, from, to, current, description } =
+      req.body;
+
+    const newEducation = {
+      school: school,
+      degree: degree,
+      fieldofstudy: fieldofstudy,
+      from: from,
+      to: to,
+      current: current,
+      description: description,
+    };
+
+    const userID = req.user.currentUser.id;
+
+    try {
+      const profile = await profileModel.findOne({ user: userID });
+
+      console.log(profile);
+
+      profile.education.unshift(newEducation);
+
+      await profile.save();
+
+      res.json(profile);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+
+//*************************************************************************************************************************** */
+// @route         DELETE  api/profile/education/:exp_id
+// @description   DELETE EDUCATION FROM PROFILE
+// @access        PRIVATE Route
+
+router.delete("/education/:edu_id", authMiddleware, async (req, res) => {
+  try {
+    const userID = req.user.currentUser.id;
+
+    const profile = await profileModel.findOne({ user: userID });
+
+    // Filter through your education array and remove the education that matches the req.params.id
+
+    const newEduArray = profile.education.filter((item) => {
+      return item.id !== req.params.edu_id;
+    });
+
+    profile.education = newEduArray;
+
+    await profile.save();
+
+    res.json(profile);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("server error");
+  }
+});
+
 module.exports = router;
