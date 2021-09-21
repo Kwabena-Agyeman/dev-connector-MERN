@@ -64,7 +64,6 @@ router.post(
 
     // remember our user's ID is in our req.user object
     // We put it there after decoding our jwt in our auth middleware
-    console.log("REQ USER", req.user.currentUser.id);
 
     const userID = req.user.currentUser.id;
 
@@ -97,8 +96,6 @@ router.post(
     if (facebook) profileFields.social.facebook = facebook;
     if (linkedin) profileFields.social.linkedin = linkedin;
     if (instagram) profileFields.social.instagram = instagram;
-
-    console.log(profileFields.skills);
 
     try {
       // Checking if any profile alreadt exists with our user's id
@@ -232,8 +229,6 @@ router.put(
     try {
       const profile = await profileModel.findOne({ user: userID });
 
-      console.log(profile);
-
       profile.experience.unshift(newExperience);
 
       await profile.save();
@@ -302,8 +297,6 @@ router.put(
 
     try {
       const profile = await profileModel.findOne({ user: userID });
-
-      console.log(profile);
 
       profile.education.unshift(newEducation);
 
