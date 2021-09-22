@@ -113,4 +113,38 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+// ***************************************************************************
+// @route            PUT api/posts/like/:id
+// @description      Like a post
+// @access           PRIVATE ROUTE
+
+router.put("/like/:id", authMiddleware, async (req, res) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+
+    // Check if the post has already been liked by the logged in user
+    // Remember, req.user.currentUser.id has the ID of the logged in user. We did this in AuthMiddleware
+    const userID = req.user.currentUser.id;
+
+    // checking if the post's Likes Array contains the ID of the user trying to like the post
+    const userLiked = post.likes.filter((like) => {
+      return like.user.toString() === userID;
+    });
+
+    if (userLiked.length > 0) {
+      return res.status(400).json({ msg: "Post already liked" });
+    }
+
+    post.likes.unshift({ user: userID });
+
+    await post.save();
+
+    res.json(post.likes);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
