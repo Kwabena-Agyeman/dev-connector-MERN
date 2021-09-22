@@ -226,4 +226,48 @@ router.post(
   }
 );
 
+// ***************************************************************************
+// @route            DELETE api/posts.comment/:id/:comment_id
+// @description      DELETE COMMENT ON A POST
+// @access           PRIVATE ROUTE
+
+router.delete("/comment/:id/:comment_id", authMiddleware, async (req, res) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+
+    // Pull out comment from post
+
+    const comment = post.comments.find(
+      (comment) => comment.id === req.params.comment_id
+    );
+
+    // Make sure comment exists
+
+    if (!comment) {
+      res.status(404).json({ msg: "comment does not exist" });
+    }
+
+    // Check if user requesting deletion is the one who created the comment
+    const userID = req.user.currentUser.id;
+
+    if (comment.user.toString() !== userID) {
+      return res.status(401).json({ msg: "user not authorized" });
+    }
+
+    // Make new comment array that excludes the comment we want to delete
+    const newCommentsArray = post.comments.filter((postComment) => {
+      return postComment.id.toString() !== comment.id;
+    });
+
+    post.comments = newCommentsArray;
+
+    post.save();
+
+    res.json(post.comments);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = router;
