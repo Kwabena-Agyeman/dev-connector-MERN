@@ -82,4 +82,35 @@ router.get("/:id", authMiddleware, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+// ***************************************************************************
+// @route            DELETE api/posts/:id
+// @description      DELETE A SINGLE POST
+// @access           PRIVATE ROUTE
+
+router.delete("/:id", authMiddleware, async (req, res) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    // check to see if user requesting the deletion is the user who created the post
+    const userID = req.user.currentUser.id;
+    if (post.user.toString() !== userID) {
+      return res.status(401).json({ msg: "User not authorized" });
+    }
+
+    post.remove();
+
+    res.json({ msg: "Post removed" });
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+    res.status(500).send("Server Error");
+  }
+});
 module.exports = router;
