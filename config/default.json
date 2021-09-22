@@ -1,4 +1,6 @@
 {
   "mongoURI": "mongodb+srv://Kwabena:Lipsy123@devconnector.bvia6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-  "jwtSecret": "secretToken"
+  "jwtSecret": "secretToken",
+  "githubClientId": "dc745248d8aba58eb87a",
+  "githubSecret": "a6d7d153d69d359cec10fcc4d5f2bab6af618184"
 }
