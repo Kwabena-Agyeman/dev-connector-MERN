@@ -189,4 +189,41 @@ router.put("/unlike/:id", authMiddleware, async (req, res) => {
   }
 });
 
+// ***************************************************************************
+// @route            POST api/posts.comment/:id
+// @description      COMMENT ON A POST
+// @access           PRIVATE ROUTE
+router.post(
+  "/comment/:id",
+  authMiddleware,
+  validations.CommentValidations,
+  validationMiddleware,
+  async (req, res) => {
+    try {
+      // getting the name, avatar and user info for the user who is commenting on the post
+      // remeber, out post model requires a user
+      const userID = req.user.currentUser.id;
+      const user = await UserModel.findById(userID).select("-password");
+
+      const post = await PostModel.findById(req.params.id);
+
+      const newComment = {
+        text: req.body.text,
+        name: user.name,
+        avatar: user.avatar,
+        user: userID,
+      };
+
+      post.comments.unshift(newComment);
+
+      post.save();
+
+      res.json(post.comments);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server Error");
+    }
+  }
+);
+
 module.exports = router;
