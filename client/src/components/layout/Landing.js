@@ -1,6 +1,7 @@
 /** @format */
 
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Landing = () => {
   return (
@@ -13,12 +14,12 @@ const Landing = () => {
             other developers
           </p>
           <div className='buttons'>
-            <a href='register.html' className='btn btn-primary'>
+            <Link to='/register' className='btn btn-primary'>
               Sign Up
-            </a>
-            <a href='login.html' className='btn btn-light'>
+            </Link>
+            <Link to='/login' className='btn btn-light'>
               Login
-            </a>
+            </Link>
           </div>
         </div>
       </div>
