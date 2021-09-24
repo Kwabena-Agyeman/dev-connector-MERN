@@ -1,6 +1,11 @@
 /** @format */
 
-import { REGISTER_FAIL, REGISTER_SUCCESS } from "./AuthTypes";
+import {
+  REGISTER_FAIL,
+  REGISTER_SUCCESS,
+  USER_LOADED,
+  AUTH_ERROR,
+} from "./AuthTypes";
 
 const initialState = {
   token: localStorage.getItem("token"),
@@ -21,13 +26,22 @@ const AuthReducer = (state = initialState, action) => {
         loading: false,
       };
     }
-    case REGISTER_FAIL: {
+    case REGISTER_FAIL:
+    case AUTH_ERROR: {
       localStorage.removeItem("token");
       return {
         ...state,
         token: null,
         isAuthenticated: false,
         loading: false,
+      };
+    }
+    case USER_LOADED: {
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false,
+        user: payload,
       };
     }
     default:
