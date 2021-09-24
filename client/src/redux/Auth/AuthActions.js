@@ -1,7 +1,6 @@
 /** @format */
 
 import axios from "axios";
-import { set } from "mongoose";
 import { setAlert } from "../Alert/AlertActions";
 import { REGISTER_FAIL, REGISTER_SUCCESS } from "./AuthTypes";
 

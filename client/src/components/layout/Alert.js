@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 
 const Alert = ({ alerts }) => {
   if (alerts.length > 0) {
-    console.log(alerts);
     return alerts.map((alert) => {
       return (
         <div key={alert.id} className={`alert alert-${alert.alertType}`}>
@@ -15,10 +14,8 @@ const Alert = ({ alerts }) => {
       );
     });
   } else if (alerts.length === 0) {
-    console.log("part 2");
     return null;
   } else {
-    console.log("part 3");
     return null;
   }
 };

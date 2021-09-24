@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { setAlert } from "../../redux/Alert/AlertActions";
+import { register } from "../../redux/Auth/AuthActions";
 import { Link } from "react-router-dom";
 
-const Register = ({ setAlert }) => {
+const Register = ({ setAlert, register }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,7 +26,7 @@ const Register = ({ setAlert }) => {
     if (password !== password2) {
       setAlert("Passwords do not match", "danger");
     } else {
-      console.log("Success", formData);
+      register({ name: name, email: email, password: password });
     }
   };
   return (
@@ -103,4 +104,4 @@ const Register = ({ setAlert }) => {
   );
 };
 
-export default connect(null, { setAlert })(Register);
+export default connect(null, { setAlert, register })(Register);
