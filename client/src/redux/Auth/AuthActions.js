@@ -52,6 +52,7 @@ export const register =
 
       dispatch({
         type: REGISTER_SUCCESS,
+
         payload: res.data,
       });
 
